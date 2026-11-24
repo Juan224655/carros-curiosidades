@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="painel estreito">
+  <h1>Excluir marca</h1>
+  <p>Tem certeza que deseja excluir <strong>{{ object.nome }}</strong>? Carros, curiosidades e comentários dela também serão apagados.</p>
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn perigo" type="submit">Sim, excluir</button>
+    <a class="btn cinza" href="{{ object.get_absolute_url }}">Cancelar</a>
+  </form>
+</section>
+{% endblock %}

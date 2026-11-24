@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ marca.nome }} · AutoCurioso{% endblock %}
+{% block content %}
+<div class="barra">
+  <h1>{{ marca.nome }}</h1>
+  {% if user.is_authenticated %}
+  <div>
+    <a class="btn" href="{% url 'marca_update' marca.pk %}">Editar</a>
+    <a class="btn perigo" href="{% url 'marca_delete' marca.pk %}">Excluir</a>
+  </div>
+  {% endif %}
+</div>
+<section class="painel destaque">
+  {% if marca.foto %}<img class="foto-grande" src="{{ marca.foto.url }}" alt="{{ marca.nome }}">{% endif %}
+  <p><strong>País:</strong> {{ marca.pais }} · <strong>Fundação:</strong> {{ marca.ano_fundacao }}</p>
+  <p>{{ marca.descricao|linebreaksbr }}</p>
+</section>
+
+<section class="painel">
+  <div class="barra"><h2>💡 Curiosidades</h2>
+    {% if user.is_authenticated %}<a class="btn" href="{% url 'curiosidade_create' marca.pk %}">+ Curiosidade</a>{% endif %}
+  </div>
+  {% for c in marca.curiosidades.all %}
+    <div class="item"><h3>{{ c.titulo }}</h3><p>{{ c.texto|linebreaksbr }}</p></div>
+  {% empty %}<p>Sem curiosidades ainda.</p>{% endfor %}
+</section>
+
+<section class="painel">
+  <div class="barra"><h2>🚘 Carros</h2>
+    {% if user.is_authenticated %}<a class="btn" href="{% url 'carro_create' marca.pk %}">+ Carro</a>{% endif %}
+  </div>
+  <div class="grade">
+    {% for carro in marca.carros.all %}
+      <div class="card">
+        {% if carro.foto %}<img src="{{ carro.foto.url }}" alt="{{ carro.modelo }}">{% else %}<div class="sem-foto">🚗</div>{% endif %}
+        <div class="card-corpo"><h3>{{ carro.modelo }} ({{ carro.ano }})</h3><p>{{ carro.descricao }}</p></div>
+      </div>
+    {% empty %}<p>Nenhum carro cadastrado.</p>{% endfor %}
+  </div>
+</section>
+
+<section class="painel">
+  <h2>💬 Comentários</h2>
+  {% if user.is_authenticated %}
+    <form method="post" action="{% url 'comentar' marca.pk %}">
+      {% csrf_token %}
+      {{ comentario_form.texto }}
+      <button class="btn" type="submit">Comentar</button>
+    </form>
+  {% else %}
+    <p><a href="{% url 'login' %}?next={{ request.path }}">Entre</a> para comentar.</p>
+  {% endif %}
+  {% for com in marca.comentarios.all %}
+    <div class="item"><strong>{{ com.autor.username }}</strong> <small>{{ com.criado_em|date:"d/m/Y H:i" }}</small>
+      <p>{{ com.texto|linebreaksbr }}</p></div>
+  {% empty %}<p>Seja o primeiro a comentar!</p>{% endfor %}
+</section>
+{% endblock %}
